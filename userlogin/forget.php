@@ -62,7 +62,7 @@ function send_password_reset($get_email,$token){
 
 if(isset($_POST['reset'])){
   $email = mysqli_real_escape_string($conn, $_POST['email']);
-  $token = md5(rand());
+  $token = idate('U').rand(111,999);
 
     $user = "SELECT * FROM `user` WHERE `user`.`username` = '$email' LIMIT 1";
     $data = mysqli_query($conn, $user);
