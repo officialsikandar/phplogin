@@ -63,14 +63,15 @@ function send_password_reset($get_email,$token){
 if(isset($_POST['reset'])){
   $email = mysqli_real_escape_string($conn, $_POST['email']);
   $token = idate('U').rand(111,999);
-
+  $timeStamp = getdate(date('U'));
+  $ts = "$timeStamp[0]";
     $user = "SELECT * FROM `user` WHERE `user`.`username` = '$email' LIMIT 1";
     $data = mysqli_query($conn, $user);
     $row = mysqli_num_rows($data);
     if($row == 1){
       $data = mysqli_fetch_assoc($data);
       $get_email = $data['username'];
-      $update_token = "UPDATE `user` SET `token` = '$token' WHERE `user`.`username` = '$get_email'";
+      $update_token = "UPDATE `user` SET `token` = '$token', `timeStamp` = '$ts' WHERE `user`.`username` = '$get_email'";
       $update_token_run = mysqli_query($conn, $update_token);
       if($update_token_run){
           send_password_reset($get_email,$token);
