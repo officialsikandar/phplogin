@@ -7,6 +7,8 @@ if(isset($_POST['submit'])){
   $otp = mysqli_real_escape_string($conn, $_POST['otp']);
   $password = mysqli_real_escape_string($conn, $_POST['password']);
   $cpassword = mysqli_real_escape_string($conn, $_POST['cpassword']);
+  $timeStamp = getdate(date('U'));
+  $ts = "$timeStamp[0]";
     $user = "SELECT * FROM `user` WHERE `user`.`username` = '$email' LIMIT 1";
     $data = mysqli_query($conn, $user);
     $row = mysqli_num_rows($data);
@@ -14,19 +16,28 @@ if(isset($_POST['submit'])){
       $data = mysqli_fetch_assoc($data);
       $get_email = $data['username'];
       $get_token = $data['token'];
+      $get_timeStamp = $data['timeStamp'];
       
-      echo $get_token."   ".$get_email."   ".$otp;
+      // echo $get_token."   ".$get_email."   ".$otp;
       if($get_token === $otp){
-        if($password === $cpassword){
-          $update_password = "UPDATE `user` SET `password` = '$password' WHERE `user`.`username` = '$get_email';";
-          $update_password_run = mysqli_query($conn, $update_password);
-          if($update_password_run){
-            echo '<script>alert("Password Successfully Updated");</script>';
-            header('Location: http://localhost/php1/userlogin/');
+        if($ts-$get_timeStamp <= 20){
+          if($password === $cpassword){
+            $update_password = "UPDATE `user` SET `password` = '$password' WHERE `user`.`username` = '$get_email';";
+            $update_password_run = mysqli_query($conn, $update_password);
+            if($update_password_run){
+              echo '<script>alert("Password Successfully Updated");</script>';
+              header('Location: http://localhost/php1/userlogin/');
+            }
+            else{
+              echo '<script>alert("Password Not Updated, Something went wrong!");</script>';
+            }
           }
           else{
-            echo '<script>alert("Password Not Updated, Something went wrong!");</script>';
+              echo '<script>alert("Confirm Password Not Matched!");</script>';
           }
+        }
+        else{
+          echo '<script>alert("Time is Out!");</script>';
         }
       }
       else{
